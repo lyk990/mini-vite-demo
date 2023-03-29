@@ -14,12 +14,12 @@ export async function optimize(root: string) {
   const entry = path.resolve(root, "src/main.tsx");
   // 2. 从入口处扫描依赖
   const deps = new Set<string>();
-  // await build({
-  //   entryPoints: [entry],
-  //   bundle: true,
-  //   write: false,
-  //   plugins: [scanPlugin(deps)],
-  // });
+  await build({
+    entryPoints: [entry],
+    bundle: true,
+    write: false,
+    plugins: [scanPlugin(deps)],
+  });
   await build({
     entryPoints: [...deps],
     write: true,
