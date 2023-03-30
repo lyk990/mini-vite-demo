@@ -3,15 +3,19 @@ import { isJSRequest, cleanUrl } from "../../utils";
 import { ServerContext } from "../index";
 import createDebug from "debug";
 import { isCSSRequest } from "../../utils";
-
+import { isImportRequest } from "../../utils";
 const debug = createDebug("dev");
 
 export async function transformRequest(
   url: string,
   serverContext: ServerContext
 ) {
-  const { pluginContainer } = serverContext;
+  const { moduleGraph, pluginContainer } = serverContext;
   url = cleanUrl(url);
+  let mod = await moduleGraph.getModuleByUrl(url);
+  if (mod && mod.transformResult) {
+    return mod.transformResult;
+  }
   // 简单来说，就是依次调用插件容器的 resolveId、load、transform 方法
   const resolvedResult = await pluginContainer.resolveId(url);
   let transformResult;
@@ -20,12 +24,17 @@ export async function transformRequest(
     if (typeof code === "object" && code !== null) {
       code = code.code;
     }
+    const { moduleGraph } = serverContext;
+    mod = await moduleGraph.ensureEntryFromUrl(url);
     if (code) {
       transformResult = await pluginContainer.transform(
         code as string,
         resolvedResult?.id
       );
     }
+  }
+  if (mod) {
+    mod.transformResult = transformResult;
   }
   return transformResult;
 }
@@ -40,7 +49,7 @@ export function transformMiddleware(
     const url = req.url;
     debug("transformMiddleware: %s", url);
     // transform JS request
-    if (isJSRequest(url) || isCSSRequest(url)) {
+    if (isJSRequest(url) || isCSSRequest(url) || isImportRequest(url)) {
       // 核心编译函数
       let result = await transformRequest(url, serverContext);
       if (!result) {

@@ -10,7 +10,7 @@ import { Plugin } from "./plugin";
 export interface PluginContainer {
   resolveId(id: string, importer?: string): Promise<PartialResolvedId | null>;
   load(id: string): Promise<LoadResult | null>;
-  transform(code: string, id: string): Promise<SourceDescription | null>;
+  transform(code: string, id: string): Promise<LoadResult  | null>;
 }
 
 // src/node/pluginContainer.ts
