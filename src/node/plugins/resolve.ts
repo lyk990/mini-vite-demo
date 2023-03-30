@@ -40,7 +40,7 @@ export function resolvePlugin(): Plugin {
             resolve.sync(id, { basedir: path.dirname(importer) })
           );
           if (await pathExists(resolvedId)) {
-            return { id: resolvedId };
+            return { id };
           }
         }
         // 2.2 不包含文件名后缀
@@ -56,7 +56,7 @@ export function resolvePlugin(): Plugin {
                 })
               );
               if (await pathExists(resolvedId)) {
-                return { id: resolvedId };
+                return { id: withExtension  };
               }
             } catch (e) {
               continue;
