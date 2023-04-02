@@ -39,7 +39,7 @@ export async function startDevServer() {
     ignoreInitial: true,
   });
   const serverContext: ServerContext = {
-    root: process.cwd(),
+    root: normalizePath(process.cwd()),
     app,
     pluginContainer,
     plugins,

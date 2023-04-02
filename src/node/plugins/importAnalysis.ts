@@ -62,7 +62,7 @@ export function importAnalysisPlugin(): Plugin {
           }
         }
       }
-
+      moduleGraph.updateModuleInfo(curMod, importedModules);
       return {
         code: ms.toString(),
         // 生成 SourceMap

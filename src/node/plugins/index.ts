@@ -4,6 +4,7 @@ import { resolvePlugin } from "./resolve";
 import { Plugin } from "../plugin";
 import { cssPlugin } from "./css";
 import { assetPlugin } from "./assets";
+import { clientInjectPlugin } from "./clientInject";
 
 export function resolvePlugins(): Plugin[] {
   return [
@@ -12,5 +13,6 @@ export function resolvePlugins(): Plugin[] {
     resolvePlugin(),
     esbuildTransformPlugin(),
     importAnalysisPlugin(),
+    clientInjectPlugin(),
   ];
 }
