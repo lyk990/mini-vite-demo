@@ -13,7 +13,6 @@ export interface PluginContainer {
   transform(code: string, id: string): Promise<LoadResult  | null>;
 }
 
-// src/node/pluginContainer.ts
 // 模拟 Rollup 的插件机制
 export const createPluginContainer = (plugins: Plugin[]): PluginContainer => {
   // 插件上下文对象

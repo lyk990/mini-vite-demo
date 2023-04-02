@@ -9,8 +9,6 @@ import { PRE_BUNDLE_DIR } from "../constants";
 
 export async function optimize(root: string) {
   // 1. 确定入口
-  // 2. 从入口处扫描依赖
-  // 3. 预构建依赖
   const entry = path.resolve(root, "src/main.tsx");
   // 2. 从入口处扫描依赖
   const deps = new Set<string>();
@@ -20,6 +18,7 @@ export async function optimize(root: string) {
     write: false,
     plugins: [scanPlugin(deps)],
   });
+  // 3.预构建依赖
   await build({
     entryPoints: [...deps],
     write: true,

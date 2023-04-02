@@ -8,7 +8,7 @@ export function slash(p: string): string {
 }
 
 export const isWindows = os.platform() === "win32";
-
+/**路径字符串进行了规范化 */
 export function normalizePath(id: string): string {
   return path.posix.normalize(isWindows ? slash(id) : id);
 }
