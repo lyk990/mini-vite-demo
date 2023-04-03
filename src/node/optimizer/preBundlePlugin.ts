@@ -1,13 +1,9 @@
 import { Loader, Plugin } from "esbuild";
 import { BARE_IMPORT_RE } from "../constants";
-// 用来分析 es 模块 import/export 语句的库
 import { init, parse } from "es-module-lexer";
 import path from "path";
-// 一个实现了 node 路径解析算法的库
 import resolve from "resolve";
-// 一个更加好用的文件操作库
 import fs from "fs-extra";
-// 用来开发打印 debug 日志的库
 import createDebug from "debug";
 import { normalizePath } from "../utils";
 
@@ -56,8 +52,6 @@ export function preBundlePlugin(deps: Set<string>): Plugin {
           let proxyModule = [];
           // cjs
           if (!imports.length && !exports.length) {
-            // 构造代理模块
-            // 下面的代码后面会解释
             const res = require(entryPath);
             const specifiers = Object.keys(res);
             proxyModule.push(
@@ -65,7 +59,6 @@ export function preBundlePlugin(deps: Set<string>): Plugin {
               `export default require("${entryPath}")`
             );
           } else {
-            // esm 格式比较好处理，export * 或者 export default 即可
             if (exports.includes("default")) {
               proxyModule.push(`import d from "${entryPath}";export default d`);
             }

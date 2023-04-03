@@ -1,4 +1,3 @@
-// src/node/optimizer/scanPlugin.ts
 import { Plugin } from "esbuild";
 import { BARE_IMPORT_RE, EXTERNAL_TYPES } from "../constants";
 
@@ -12,7 +11,6 @@ export function scanPlugin(deps: Set<string>): Plugin {
         (resolveInfo) => {
           return {
             path: resolveInfo.path,
-            // 打上 external 标记
             external: true,
           };
         }
@@ -24,7 +22,6 @@ export function scanPlugin(deps: Set<string>): Plugin {
         },
         (resolveInfo) => {
           const { path: id } = resolveInfo;
-          // 推入 deps 集合中
           deps.add(id);
           return {
             path: id,

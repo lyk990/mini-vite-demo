@@ -1,9 +1,15 @@
 import { NextHandleFunction } from "connect";
-import { isJSRequest, cleanUrl } from "../../utils";
+import { CLIENT_PUBLIC_PATH } from "../../constants";
+import {
+  isJSRequest,
+  isCSSRequest,
+  isImportRequest,
+  isInternalRequest,
+  cleanUrl,
+} from "../../utils";
 import { ServerContext } from "../index";
 import createDebug from "debug";
-import { isCSSRequest } from "../../utils";
-import { isImportRequest } from "../../utils";
+
 const debug = createDebug("dev");
 
 export async function transformRequest(
@@ -16,7 +22,6 @@ export async function transformRequest(
   if (mod && mod.transformResult) {
     return mod.transformResult;
   }
-  // 简单来说，就是依次调用插件容器的 resolveId、load、transform 方法
   const resolvedResult = await pluginContainer.resolveId(url);
   let transformResult;
   if (resolvedResult?.id) {
@@ -24,7 +29,6 @@ export async function transformRequest(
     if (typeof code === "object" && code !== null) {
       code = code.code;
     }
-    const { moduleGraph } = serverContext;
     mod = await moduleGraph.ensureEntryFromUrl(url);
     if (code) {
       transformResult = await pluginContainer.transform(
@@ -48,9 +52,13 @@ export function transformMiddleware(
     }
     const url = req.url;
     debug("transformMiddleware: %s", url);
-    // transform JS request
-    if (isJSRequest(url) || isCSSRequest(url) || isImportRequest(url)) {
-      // 核心编译函数
+    // transform JS and CSS request
+    if (
+      isJSRequest(url) ||
+      isCSSRequest(url) ||
+      // 静态资源的 import 请求，如 import logo from './logo.svg?import';
+      isImportRequest(url)
+    ) {
       let result = await transformRequest(url, serverContext);
       if (!result) {
         return next();
@@ -58,7 +66,6 @@ export function transformMiddleware(
       if (result && typeof result !== "string") {
         result = result.code;
       }
-      // 编译完成，返回响应给浏览器
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/javascript");
       return res.end(result);

@@ -60,26 +60,20 @@ export class ModuleGraph {
           : curImports;
       if (dep) {
         mod.importedModules.add(dep);
-        if (dep.importers) {
-          dep.importers.add(mod);
-        }
+        dep.importers.add(mod);
       }
     }
     // 清除已经不再被引用的依赖
     for (const prevImport of prevImports) {
       if (!importedModules.has(prevImport.url)) {
-        if (prevImport.importers) {
-          prevImport.importers.delete(mod);
-        }
+        prevImport.importers.delete(mod);
       }
     }
   }
 
-  // HMR 触发时会执行这个方法
   invalidateModule(file: string) {
     const mod = this.idToModuleMap.get(file);
     if (mod) {
-      // 更新时间戳
       mod.lastHMRTimestamp = Date.now();
       mod.transformResult = null;
       mod.importers.forEach((importer) => {

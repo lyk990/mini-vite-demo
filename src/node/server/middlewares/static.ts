@@ -1,6 +1,6 @@
 import { NextHandleFunction } from "connect";
+import { CLIENT_PUBLIC_PATH } from "../../constants";
 import { isImportRequest } from "../../utils";
-// 一个用于加载静态资源的中间件
 import sirv from "sirv";
 
 export function staticMiddleware(root: string): NextHandleFunction {
@@ -9,8 +9,7 @@ export function staticMiddleware(root: string): NextHandleFunction {
     if (!req.url) {
       return;
     }
-    // 不处理 import 请求
-    if (isImportRequest(req.url)) {
+    if (isImportRequest(req.url) || req.url === CLIENT_PUBLIC_PATH) {
       return;
     }
     serveFromRoot(req, res, next);
